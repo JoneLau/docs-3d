@@ -2,9 +2,9 @@
 
 如上一篇文档所述，cc.Node 有一套完整的 [事件监听和分发机制](event-emit.md)。在这套机制之上，我们提供了一些基础的节点相关的系统事件，这篇文档将介绍这些事件的使用方式。
 
-Cocos Creator 支持的系统事件包含鼠标、触摸、键盘、重力传感四种，其中本章节重点介绍与节点树相关联的鼠标和触摸事件，这些事件是被直接触发在相关节点上的，所以被称为节点系统事件。与之对应的，键盘和重力传感事件被称为全局系统事件，细节可以参考 [全局系统事件文档](event-input.md)。
+Cocos Creator 支持的系统事件包含鼠标、触摸、键盘和重力传感四种，它们被称为[全局事件](event-input.md)。本章节重点介绍与 UI 节点树相关联的鼠标和触摸事件，这些事件是被直接触发在 UI 相关节点上的，所以被称为节点事件。
 
-系统事件遵守通用的注册方式，开发者既可以使用枚举类型也可以直接使用事件名来注册事件的监听器，事件名的定义遵循 DOM 事件标准。
+节点事件遵守通用的注册方式，开发者既可以使用枚举类型也可以直接使用事件名来注册事件的监听器，在这里建议使用枚举的方式来注册事件，避免事件因为书写问题导致注册失败。
 
 ```ts
 // 使用枚举类型来注册
@@ -31,30 +31,11 @@ node.on('mouse-down', (event) => {
 | cc.Node.EventType.MOUSE_UP        | mouse-up          | 当鼠标从按下状态松开时触发一次。     |
 | cc.Node.EventType.MOUSE_WHEEL     |  mouse-wheel      | 当鼠标滚轮滚动时。                |
 
-鼠标事件（cc.Event.EventMouse）的重要 API 如下（cc.Event 标准事件 API 除外）：
-
-| 函数名                 | 返回值类型             | 意义             |
-| :-------------             | :----------            |   :----------        |
-| getScrollY      |  Number             | 获取滚轮滚动的 Y 轴距离，只有滚动时才有效。                      |
-| getLocation              | Vec2                 |    获取鼠标位置对象，对象包含 x 和 y 属性。                      |
-| getLocationX              | Number                | 获取鼠标的 X 轴位置。                      |
-| getLocationY              | Number            | 获取鼠标的 Y 轴位置。                      |
-| getPreviousLocation       | Vec2              | 获取鼠标事件上次触发时的位置对象，对象包含 x 和 y 属性。                      |
-| getDelta                  | Vec2              | 获取鼠标距离上一次事件移动的距离对象，对象包含 x 和 y 属性。                      |
-| getDeltaX                 | Number | 获取鼠标距离上一次事件移动的 X 轴距离。                      |
-| getDeltaY                 | Number | 获取鼠标距离上一次事件移动的 Y 轴距离。                      |
-| getButton                 | Number | cc.Event.EventMouse.BUTTON_LEFT 或 cc.Event.EventMouse.BUTTON_RIGHT 或 cc.Event.EventMouse.BUTTON_MIDDLE。                     ｜
-| getUILocation             | Vec2          | 获取当前鼠标在 UI 窗口内相对于左下角的坐标位置，对象包含 x 和 y 属性。                      |
-| getUILocationX            | Number | 获取当前鼠标在 UI 窗口内相对于左下角的 X 轴位置。                      |
-| getUILocationY            | Number | 获取当前鼠标在 UI 窗口内相对于左下角的 Y 轴位置。                      |
-| getUIPreviousLocation     | Vec2 | 获取上一次鼠标在 UI 窗口内相对于左下角的坐标位置，对象包含 x 和 y 属性。                      |
-| getUIDelta                | Vec2 | 获取鼠标距离上一次事件移动在 UI 坐标系下的距离对象，对象包含 x 和 y 属性。                      |
-| getUIDeltaX               | Number | 获取当前鼠标距离上一次鼠标移动在 UI 窗口内相对于左下角的 X 轴距离。                      |
-| getUIDeltaY               | Number | 获取当前鼠标距离上一次鼠标移动在 UI 窗口内相对于左下角的 Y 轴距离。                      |
+鼠标事件（cc.Event.EventMouse）的重要 API 请参考[鼠标事件 API](event-api.md#鼠标事件-API)（cc.Event 标准事件 API 除外）。
 
 ## 触摸事件类型和事件对象
 
-触摸事件在移动平台和桌面平台都会触发，这样做的目的是为了更好得服务开发者在桌面平台调试，只需要监听触摸事件即可同时响应移动平台的触摸事件和桌面端的鼠标事件。系统提供的触摸事件类型如下：
+触摸事件在移动平台和桌面平台都会触发，开发者可以更好的在桌面平台调试，只需要监听触摸事件即可同时响应移动平台的触摸事件和桌面端的鼠标事件。系统提供的触摸事件类型如下：
 
 | 枚举对象定义                 | 对应的事件名             | 事件触发的时机             |
 | :-------------             | :----------            |   :----------        |
@@ -63,24 +44,7 @@ node.on('mouse-down', (event) => {
 | cc.Node.EventType.TOUCH_END | touch-end | 当手指在目标节点区域内离开屏幕时。                      |
 | cc.Node.EventType.TOUCH_CANCEL | touch-cancel | 当手指在目标节点区域外离开屏幕时。                    |
 
-触摸事件（cc.Event.EventTouch）的重要 API 如下（cc.Event 标准事件 API 除外）：
-
-| API 名                 | 类型             | 意义             |
-| :-------------             | :----------            |   :----------        |
-| touch | Touch | 与当前事件关联的触点对象。                      |
-| getID | Number | 获取触点的 ID，用于多点触摸的逻辑判断。                      |
-| getLocation | Vec2 | 获取触点位置对象，对象包含 x 和 y 属性。                      |
-| getLocationX | Number | 获取触点的 X 轴位置。                      |
-| getLocationY | Number | 获取触点的 Y 轴位置。                      |
-| getPreviousLocation | Vec2 | 获取触点上一次触发事件时的位置对象，对象包含 x 和 y 属性。                      |
-| getStartLocation | Vec2 | 获取触点初始时的位置对象，对象包含 x 和 y 属性。                      |
-| getDelta | Vec2 | 获取触点距离上一次事件移动的距离对象，对象包含 x 和 y 属性。                      |
-| getUILocation | Vec2 | 获取当前触点在 UI 窗口内相对于左下角的坐标位置，对象包含 x 和 y 属性。                      |
-| getUILocationX | Number | 获取当前触点在 UI 窗口内相对于左下角的 X 轴位置。                      |
-| getUILocationY | Number | 获取当前触点在 UI 窗口内相对于左下角的 Y 轴位置。                      |
-| getUIPreviousLocation | Vec2 | 获取上一次触点在 UI 窗口内相对于左下角的坐标位置，对象包含 x 和 y 属性。                      |
-| getUIDelta | Vec2 | 获取当前触点距离上一次触点移动在 UI 窗口内相对于左下角的距离对象，对象包含 x 和 y 属性。                      |
-| getUIStartLocation | Vec2 | 获取初始触点在 UI 窗口内相对于左下角的位置对象，对象包含 x 和 y 属性。                      |
+触摸事件（cc.Event.EventTouch）的重要 API 请参考[触摸事件 API](./event-api.md#触摸事件-API)（cc.Event 标准事件 API 除外）。
 
 需要注意的是，触摸事件支持多点触摸，每个触点都会发送一次事件给事件监听器。
 
@@ -111,7 +75,7 @@ node.on('mouse-down', (event) => {
 
 ### 将触摸或鼠标事件注册在捕获阶段
 
-有时候我们需要父节点的触摸或鼠标事件先于他的任何子节点派发，比如 **CCScrollView** 组件就是这样设计的。这时候事件冒泡已经不能满足我们的需求了，需要将父节点的事件注册在捕获阶段。
+有时候我们需要父节点的触摸或鼠标事件先于他的任何子节点派发，比如 **cc.ScrollView** 组件就是这样设计的。这时候事件冒泡已经不能满足我们的需求了，需要将父节点的事件注册在捕获阶段。
 
 要实现这个需求，可以在给 node 注册触摸或鼠标事件时，传入第四个参数 `true`，表示 `useCapture`。例如：
 
@@ -171,7 +135,7 @@ this.node.on(Node.EventType.TOUCH_START, this.onTouchStartCallback, this, true);
 
 ## 多点触摸事件
 
-引擎有多点触摸事件的屏蔽开关，多点触摸事件默认为开启状态。对于有些类型的项目为了防止多点误触，需要屏蔽多点触摸事件，可以通过以下代码进行关闭。
+引擎有多点触摸事件的屏蔽开关，多点触摸事件默认为开启状态。对于不需要多点触摸的项目，可以通过以下代码关闭允许多点触摸。
 
 ```ts
 cc.macro.ENABLE_MULTI_TOUCH = false;
